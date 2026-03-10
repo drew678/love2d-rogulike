@@ -57,7 +57,6 @@ function Map:addObject(object)
     end
 end
 
-
 function Map:move(mover, direction)
     local target = {} --target move location
     target.x = mover.x + direction.x
@@ -79,16 +78,6 @@ function Map:move(mover, direction)
     end
 end
 
-function Map:attack(attacker, target)
-    if(target.id == "player" or target.id == "enemy") then
-        target.hp = target.hp - attacker.attack
-        print(attacker.id .. " attacked " .. target.id .. " for " .. attacker.attack .. " damage. " .. target.id .. " has " .. target.hp .. " hp left.")
-        if(target.hp <= 0) then
-            print(target.id .. " has died.")
-            self.grid[target.x][target.y].object = {id = "empty"}
-        end
-    end
-end
 
 function Map:isBlocked(x, y)
     if(not self:isInBounds(x, y)) then
