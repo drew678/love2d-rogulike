@@ -57,6 +57,7 @@ Input.actions = {
     moveSoutheast = {"kp3", "n"},
     wait = {"kp5", ".", "clear"}, -- wait/skip turn
     -- Actions
+    look = {"l"},
     pickup = {",", "g"},
     inventory = {"i"},
     attack = {"a"},

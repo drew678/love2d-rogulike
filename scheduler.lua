@@ -49,7 +49,7 @@ function Scheduler:pop()
 end
 
 function Scheduler:schedule(actor, currentTime, cost)
-    local speedFactor = 100 / actor.speed
+    local speedFactor = 100 / actor.stats.speed
     local nextTime = currentTime + cost * speedFactor
     self:push(nextTime, actor)
 end

@@ -2,15 +2,30 @@ Input = require("input")
 Map = require("map")
 Fov = require("fov")
 Scheduler = require("scheduler")
+Actor = require("actor")
 
 width, height, flags = love.window.getMode()
 timer = 0
 grid = {}
-hasMoved = false
 queue = {}
 gameOver = false
---actor queue
 
+-- Best approach: Read-only table with unique table references
+local function Enum(tbl)
+    local enum = {}
+    for _, v in ipairs(tbl) do
+        enum[v] = {} -- Using empty tables ensures unique values
+    end
+    return setmetatable(enum, {
+        __newindex = function() error("Enum is read-only", 2) end,
+        __index = function(_, k) error("Key " .. tostring(k) .. " does not exist", 2) end
+    })
+end
+
+local GameStates = Enum({"TARGETING", "SIMULATING", "WAITING", "GAMEOVER"})
+
+-- Usage
+local currentGameState = GameStates.WAITING
 
 --there are 2 different coordinate systems in game
 --pixels on screen
@@ -18,7 +33,7 @@ gameOver = false
 
 function love.load()
     --we got to get all biome information/enemy information perks setup here
-    --we need saving and load done
+    --we need saving and load done=
     
     --grid init
     local num_rows = 25
@@ -32,14 +47,12 @@ function love.load()
     map:generateForestMap()
 
     --player init
-    player = {id = "player", speed = 100, hp = 100, attack = 10}
-    Scheduler:schedule(player, 0, player.speed)
+    player = Actor.new(0, 0, "player", "player", map)
+    Scheduler:schedule(player, 0, player.stats.speed)
     local x, y, found = map:getrandomEmptyCell()
-
     if(not found) then
         error("No empty cell found for player")
     end
-
     player.x = x
     player.y = y
     map:addObject(player)
@@ -52,8 +65,8 @@ function love.update(dt)
     --there must be a delay between actions and actions don't start until player inputs commands
     --when any object moves it must update it's position in the grid
     --when any object moves it must check if its target is empty
-    if(not gameOver) then
-        if(not hasMoved) then --if we haven't moved then we can move immediately
+    if(currentGameState ~= GameStates.GAMEOVER) then
+        if(currentGameState == GameStates.WAITING) then --if we haven't moved then we can move immediately
             --move or don't move
             --init direction
             local direction = {}
@@ -116,16 +129,17 @@ function love.update(dt)
             local isTryingMove = keypressed
             
             if(isTryingMove) then
-                hasMoved = map:move(player, direction)
+                if(map:move(player, direction)) then
+                    currentGameState = GameStates.SIMULATING
+                end
             end
-            if(hasMoved) then
+            if(currentGameState == GameStates.SIMULATING) then
                 timer = 0.1
-                --enemy movement
-                --what is the direction of the player
+                --simulate all actors until we get back to the player
                 while true do
                     local time, actor = Scheduler:pop()
-                    if(actor.id ~= "player") then
-                        if(actor.hp <= 0) then
+                    if(actor.type ~= "player") then
+                        if(actor.stats.hp <= 0) then
                             goto continue
                         end
                         local enemyDirection = {}
@@ -146,13 +160,14 @@ function love.update(dt)
                             enemyDirection.y = -1
                         end
                         map:move(actor, enemyDirection)
-                        Scheduler:schedule(actor, time+100, actor.speed) --we need to change that 100 to be based on action cost
+                        Scheduler:schedule(actor, time+100, actor.stats.speed) --we need to change that 100 to be based on action cost
                     else
-                        if(actor.hp <= 0) then
-                            gameOver = true
+                        currentGameState = GameStates.WAITING
+                        if(actor.stats.hp <= 0) then
+                            currentGameState = GameStates.GAMEOVER
                             print("Game Over!")
                         end
-                        Scheduler:schedule(actor, time+100, actor.speed)
+                        Scheduler:schedule(actor, time+100, actor.stats.speed)
                         break
                     end
                     ::continue::
@@ -164,7 +179,7 @@ function love.update(dt)
             timer = timer - dt
         else --if we finished waiting reset the timer and say we haven't moved so you can move again
             timer = 0
-            hasMoved = false
+            currentGameState = GameStates.WAITING
         end
         Input.update() --update input states each frame    
     end

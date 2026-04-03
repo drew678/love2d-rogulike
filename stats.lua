@@ -4,20 +4,24 @@ local Stats = {}
 
 Stats.__index = Stats
 
-function Stats.new(id)
+function Stats.new(type)
     local newStats = {}
     setmetatable(newStats, Stats)
-    newStats.id = id
-    local file = io.open("game_data/basestats.json", "r")
+
+    game_files = love.filesystem.getSource( )
+    file_path = game_files .. "/" .. "game_data/basestats.json"
+    local file = io.open(file_path)
+
     if(not file) then
         error("Stats file not found")
     end
-    local contents = file:read("*a")
+    contents = file:read("*a")
+    file:close()
     local data = json.decode(contents)
-    newStats.maxHp = data[id].maxHp
-    newStats.attack = data[id].attack
-    newStats.speed = data[id].speed
-
+    newStats.maxHp = data[type].maxHp
+    newStats.hp = newStats.maxHp
+    newStats.attack = data[type].attack
+    newStats.speed = data[type].speed
     return newStats
 end
 

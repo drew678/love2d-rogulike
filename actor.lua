@@ -1,24 +1,27 @@
 local Actor = {}
+local Stats = require("stats")
 
 Actor.__index = Actor
 
-function Actor.new(x, y, id, basestasts, map)
+function Actor.new(x, y, id, type, map)
     local newActor = {}
     setmetatable(newActor, Actor)
     newActor.x = x
     newActor.y = y
-    newActor.stats = basestasts
+    newActor.type = type
+    newActor.stats = Stats.new(type)
+    newActor.id = id
     newActor.map = map
     return newActor
 end
 
-function Actor:attack(attacker, target)
-    if(target.id == "player" or target.id == "enemy") then
-        target.hp = target.hp - attacker.attack
-        print(attacker.id .. " attacked " .. target.id .. " for " .. attacker.attack .. " damage. " .. target.id .. " has " .. target.hp .. " hp left.")
-        if(target.hp <= 0) then
-            print(target.id .. " has died.")
-            self.map.grid[target.x][target.y].object = {id = "empty"}-- you should make a function for this in map, like map:removeObject(target)
+function Actor:attack(target)
+    if((self.type == "player" and target.type == "enemy") or (self.type == "enemy" and target.type == "player")) then --allegiance check
+        target.stats.hp = target.stats.hp - self.stats.attack-- change this to a take damage function
+        print(self.type .. " attacked " .. target.type .. " for " .. self.stats.attack .. " damage. " .. target.type .. " has " .. target.stats.hp .. " hp left.")
+        if(target.stats.hp <= 0) then
+            print(target.type .. " has died.")
+            self.map.grid[target.x][target.y].object = {type = "empty"}-- you should make a function for this in map, like map:removeObject(target)
         end
     end
 end

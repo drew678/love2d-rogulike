@@ -1,5 +1,6 @@
 local Map = {}
 local Scheduler = require("scheduler")
+local Actor = require("actor")
 
 Map.__index = Map
 
@@ -31,17 +32,17 @@ function Map:generateForestMap()
     for i = 1, self.num_cols do
         self.grid[i] = {}
         for j = 1, self.num_rows do
-            local tile = {object = {id = "empty"}, visibility = false}
+            local tile = {object = {type = "empty"}, visibility = false}
             self.grid[i][j] = tile
             
             if(math.random() < 0.125) then
-                self.grid[i][j].object = {id = "tree"}
+                self.grid[i][j].object = {type = "tree"}
             elseif(math.random() < 0.01) then
-                local enemy = {x = i, y = j, id = "enemy", speed = 100, hp = 10, attack = 1}
+                local enemy = Actor.new(i, j, "enemy", "enemy", self)
                 Scheduler:push(0, enemy)
                 self.grid[i][j].object = enemy
             else
-                self.grid[i][j].object = {id = "empty"}
+                self.grid[i][j].object = {type = "empty"}
             end
         end
     end
@@ -63,14 +64,14 @@ function Map:move(mover, direction)
     target.y = mover.y + direction.y
 
     if(self:isInBounds(target.x, target.y)) then --out of bounds check
-        if(self.grid[target.x][target.y].object.id == "empty") then --empty space check
-            self.grid[mover.x][mover.y].object = {id = "empty"}
+        if(self.grid[target.x][target.y].object.type == "empty") then --empty space check
+            self.grid[mover.x][mover.y].object = {type = "empty"}
             mover.x = target.x
             mover.y = target.y
             self.grid[mover.x][mover.y].object = mover
             return true
         else
-            self:attack(mover, self.grid[target.x][target.y].object) --attack
+            mover:attack(self.grid[target.x][target.y].object) --attack
             return true
         end
     else
@@ -78,12 +79,11 @@ function Map:move(mover, direction)
     end
 end
 
-
 function Map:isBlocked(x, y)
     if(not self:isInBounds(x, y)) then
         return true
     end
-    return self.grid[x][y].object.id == "tree"
+    return self.grid[x][y].object.type == "tree"
 end
 
 function Map:setVisible(x, y)
@@ -113,7 +113,7 @@ function Map:getrandomEmptyCell()
         for j = 1, self.num_rows do
             local xi = (x + i -1) % (self.num_cols + 1)
             local yj = (y + j -1) % (self.num_rows + 1)
-            if(self.grid[xi][yj].object.id == "empty") then
+            if(self.grid[xi][yj].object.type == "empty") then
                 return xi, yj, true
             end
         end
@@ -129,13 +129,13 @@ function Map:draw()
     for i = 1, self.num_cols do
         for j = 1, self.num_rows do
             if(self.grid[i][j].visibility == true) then
-                if(self.grid[i][j].object.id == "tree") then
+                if(self.grid[i][j].object.type == "tree") then
                     love.graphics.setColor({0,1,0})--walls
                     love.graphics.rectangle("fill", (i-1)*self.row_length, (j-1)*self.col_length, self.row_length, self.col_length)
-                elseif(self.grid[i][j].object.id == "enemy") then
+                elseif(self.grid[i][j].object.type == "enemy") then
                     love.graphics.setColor({1,0,0})--enemies
                     love.graphics.circle("fill", gridCoordstoScreen(i, self.row_length), gridCoordstoScreen(j, self.col_length), math.min(self.row_length/2, self.col_length/2))
-                elseif(self.grid[i][j].object.id == "player") then
+                elseif(self.grid[i][j].object.type == "player") then
                     love.graphics.setColor({1,1,1})--player
                     love.graphics.circle("fill", gridCoordstoScreen(i, self.row_length), gridCoordstoScreen(j, self.col_length), math.min(self.row_length/2, self.col_length/2))--player
                 end
