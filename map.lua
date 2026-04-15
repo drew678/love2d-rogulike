@@ -1,6 +1,8 @@
 local Map = {}
 local Scheduler = require("scheduler")
 local Actor = require("actor")
+local GameStates = require("gameStates")
+local target = {x = 0, y = 0, targeting = false}
 
 Map.__index = Map
 
@@ -14,6 +16,18 @@ function Map.new(num_rows, num_cols, row_length, col_length)
     newMap.col_length = col_length
 
     return newMap
+end
+
+function Map:setTarget(target)
+    self.target.x = target.x
+    self.target.y = target.y
+    self.target.targeting = true
+end
+
+function Map:removeTarget()
+    self.target.x = 0
+    self.target.y = 0
+    self.target.targeting = false
 end
 
 --doesn't work
@@ -32,7 +46,7 @@ function Map:generateForestMap()
     for i = 1, self.num_cols do
         self.grid[i] = {}
         for j = 1, self.num_rows do
-            local tile = {object = {type = "empty"}, visibility = false}
+            local tile = {object = {type = "empty"}, visibility = "unseen"}
             self.grid[i][j] = tile
             
             if(math.random() < 0.125) then
@@ -90,7 +104,7 @@ function Map:setVisible(x, y)
     if(not self:isInBounds(x, y)) then
         return
     end
-    self.grid[x][y].visibility = true
+    self.grid[x][y].visibility = "seeing"
 end
 
 function Map:isInBounds(x, y)
@@ -100,7 +114,9 @@ end
 function Map:resetVisibility()
     for i = 1, self.num_cols do
         for j = 1, self.num_rows do
-            self.grid[i][j].visibility = false
+            if( self.grid[i][j].visibility == "seeing") then
+                self.grid[i][j].visibility = "seen"
+            end
         end
     end
 end
@@ -128,7 +144,7 @@ end
 function Map:draw()
     for i = 1, self.num_cols do
         for j = 1, self.num_rows do
-            if(self.grid[i][j].visibility == true) then
+            if(self.grid[i][j].visibility == "seeing") then
                 if(self.grid[i][j].object.type == "tree") then
                     love.graphics.setColor({0,1,0})--walls
                     love.graphics.rectangle("fill", (i-1)*self.row_length, (j-1)*self.col_length, self.row_length, self.col_length)
@@ -139,6 +155,21 @@ function Map:draw()
                     love.graphics.setColor({1,1,1})--player
                     love.graphics.circle("fill", gridCoordstoScreen(i, self.row_length), gridCoordstoScreen(j, self.col_length), math.min(self.row_length/2, self.col_length/2))--player
                 end
+            elseif(self.grid[i][j].visibility == "seen") then
+                if(self.grid[i][j].object.type == "tree") then
+                    love.graphics.setColor({0,0.5,0})--seen walls
+                    love.graphics.rectangle("fill", (i-1)*self.row_length, (j-1)*self.col_length, self.row_length, self.col_length)
+                end
+            elseif(target.targeting and target.x == i and target.y == j) then
+                love.graphics.setColor({1,1,1})--targeting
+                love.graphics.rectangle("fill", (i-1)*self.row_length, (j-1)*self.col_length, self.row_length/5, self.col_length/10)
+                love.graphics.rectangle("fill", (i-1)*self.row_length, (j-1)*self.col_length, self.row_length/10, self.col_length/5)
+
+                love.graphics.rectangle("fill", (i)*self.row_length - self.row_length/5, (j-1)*self.col_length, self.row_length/5, self.col_length/10)
+                love.graphics.rectangle("fill", (i)*self.row_length - self.row_length/10, (j-1)*self.col_length, self.row_length/10, self.col_length/5)
+
+                love.graphics.rectangle("fill", (i-1)*self.row_length - self.row_length/5, (j)*self.col_length - self.col_length/10, self.row_length/5, self.col_length/10)
+                love.graphics.rectangle("fill", (i-1)*self.row_length - self.row_length/10, (j)*self.col_length, self.row_length/10, self.col_length/5)
             end
         end
     end
