@@ -9,6 +9,6 @@ local function Enum(tbl)
     })
 end
 
-local GameStates = Enum({"TARGETING", "SIMULATING", "WAITING", "GAMEOVER"})
+local GameStates = Enum({"TARGETING", "SIMULATING", "WAITING", "GAMEOVER", "INVENTORY", "DELAY"})
 
 return GameStates

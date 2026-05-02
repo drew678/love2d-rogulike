@@ -1,4 +1,5 @@
 local Input = {}
+loveli = require("LOVELi")
 
 -- Table to track key states
 Input.keysDown = {}
@@ -7,11 +8,35 @@ Input.keysReleased = {}
 
 function love.keypressed(key, scancode, isrepeat)
     Input.keypressed(key)
+    layoutmanager:keypressed(key, scancode, isrepeat)
 end
 
 function love.keyreleased(key, scancode)
     Input.keyreleased(key)
-end 
+end
+
+function love.textinput(text)
+    layoutmanager:textinput(text)
+end
+
+function love.mousepressed(x, y, button, istouch, presses)
+    layoutmanager:mousepressed(x, y, button, istouch, presses)
+end
+function love.mousereleased(x, y, button, istouch, presses)
+    layoutmanager:mousereleased(x, y, button, istouch, presses)
+end
+function love.mousemoved(x, y, dx, dy, istouch)
+    layoutmanager:mousemoved(x, y, dx, dy, istouch)
+end
+function love.wheelmoved(dx, dy)
+    layoutmanager:wheelmoved(dx, dy)
+end
+function love.joystickhat(joystick, hat, direction)
+    layoutmanager:joystickhat(joystick, hat, direction)
+end
+function love.joystickpressed(joystick, button)
+    layoutmanager:joystickpressed(joystick, button)
+end
 
 -- Call this in love.keypressed callback
 function Input.keypressed(key)
@@ -47,14 +72,14 @@ end
 -- Example: map actions to keys
 Input.actions = {
     -- Movement: numpad and vi keys
-    moveNorth = {"up", "kp8", "k"},
-    moveSouth = {"down", "kp2", "j"},
-    moveWest = {"left", "kp4", "h"},
-    moveEast = {"right", "kp6", "l"},
-    moveNorthwest = {"kp7", "y"},
-    moveNortheast = {"kp9", "u"},
-    moveSouthwest = {"kp1", "b"},
-    moveSoutheast = {"kp3", "n"},
+    moveNorth = {"up", "kp8"},
+    moveSouth = {"down", "kp2"},
+    moveWest = {"left", "kp4"},
+    moveEast = {"right", "kp6"},
+    moveNorthwest = {"kp7"},
+    moveNortheast = {"kp9"},
+    moveSouthwest = {"kp1"},
+    moveSoutheast = {"kp3"},
     wait = {"kp5", ".", "clear"}, -- wait/skip turn
     -- Actions
     look = {"l"},
