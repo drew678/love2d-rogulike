@@ -10,10 +10,6 @@ grid = {}
 queue = {}
 gameOver = false
 
-targeting = {}
-targeting.x = 0
-targeting.y = 0
-
 local currentGameState = GameStates.WAITING
 
 --there are 2 different coordinate systems in game
@@ -54,9 +50,10 @@ function love.update(dt)
         local direction = {}
         isTryingMove, direction = getMovementInput()
         
-        -- if Input.wasActionPressed("look") and not isTryingMove then
-        --     currentGameState = GameStates.TARGETING
-        -- end
+        if Input.wasActionPressed("look") and not isTryingMove then
+            currentGameState = GameStates.TARGETING
+            map:setTarget({x = player.x, y = player.y})
+        end
 
         if isTryingMove then
             if(map:move(player, direction)) then
@@ -64,7 +61,17 @@ function love.update(dt)
             end
         end
     elseif currentGameState == GameStates.TARGETING then
-            
+        local isTryingMove = false
+        local direction = {}
+        isTryingMove, direction = getMovementInput()
+        if isTryingMove then
+            map:moveTarget(direction)
+            isTryingMove = false
+        end
+        if(Input.wasActionPressed("quit")) then
+            currentGameState = GameStates.WAITING
+            map:removeTarget()
+        end
     elseif currentGameState == GameStates.SIMULATING then
         --simulate all actors until we get back to the player
         while true do
@@ -250,7 +257,7 @@ function love.draw()
     --draw all objects in list at position xy
     map:draw()
     if(currentGameState == GameStates.TARGETING) then
-        love.graphics.setColor({1,0,0})
-        love.graphics.rectangle("line", gridCoordstoScreen(map.col_length, targeting.x), gridCoordstoScreen(map.row_length, targeting.y), map.col_length, map.row_length)
+        --love.graphics.setColor({1,0,0})
+        --love.graphics.rectangle("line", gridCoordstoScreen(map.col_length, targeting.x), gridCoordstoScreen(map.row_length, targeting.y), map.col_length, map.row_length)
     end
 end

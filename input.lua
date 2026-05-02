@@ -47,14 +47,14 @@ end
 -- Example: map actions to keys
 Input.actions = {
     -- Movement: numpad and vi keys
-    moveNorth = {"up", "kp8", "k"},
-    moveSouth = {"down", "kp2", "j"},
-    moveWest = {"left", "kp4", "h"},
-    moveEast = {"right", "kp6", "l"},
-    moveNorthwest = {"kp7", "y"},
-    moveNortheast = {"kp9", "u"},
-    moveSouthwest = {"kp1", "b"},
-    moveSoutheast = {"kp3", "n"},
+    moveNorth = {"up", "kp8"},
+    moveSouth = {"down", "kp2"},
+    moveWest = {"left", "kp4"},
+    moveEast = {"right", "kp6"},
+    moveNorthwest = {"kp7"},
+    moveNortheast = {"kp9"},
+    moveSouthwest = {"kp1"},
+    moveSoutheast = {"kp3"},
     wait = {"kp5", ".", "clear"}, -- wait/skip turn
     -- Actions
     look = {"l"},

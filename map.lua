@@ -2,7 +2,6 @@ local Map = {}
 local Scheduler = require("scheduler")
 local Actor = require("actor")
 local GameStates = require("gameStates")
-local target = {x = 0, y = 0, targeting = false}
 
 Map.__index = Map
 
@@ -14,7 +13,7 @@ function Map.new(num_rows, num_cols, row_length, col_length)
     newMap.num_cols = num_cols
     newMap.row_length = row_length
     newMap.col_length = col_length
-
+    newMap.target = {x = 0, y = 0, targeting = false}
     return newMap
 end
 
@@ -22,6 +21,13 @@ function Map:setTarget(target)
     self.target.x = target.x
     self.target.y = target.y
     self.target.targeting = true
+end
+
+function Map:moveTarget(direction)
+    if(self:isInBounds(self.target.x + direction.x, self.target.y + direction.y)) then
+        self.target.x = self.target.x + direction.x
+        self.target.y = self.target.y + direction.y
+    end
 end
 
 function Map:removeTarget()
@@ -160,7 +166,8 @@ function Map:draw()
                     love.graphics.setColor({0,0.5,0})--seen walls
                     love.graphics.rectangle("fill", (i-1)*self.row_length, (j-1)*self.col_length, self.row_length, self.col_length)
                 end
-            elseif(target.targeting and target.x == i and target.y == j) then
+            end
+            if(self.target.targeting and self.target.x == i and self.target.y == j) then
                 love.graphics.setColor({1,1,1})--targeting
                 love.graphics.rectangle("fill", (i-1)*self.row_length, (j-1)*self.col_length, self.row_length/5, self.col_length/10)
                 love.graphics.rectangle("fill", (i-1)*self.row_length, (j-1)*self.col_length, self.row_length/10, self.col_length/5)
@@ -168,8 +175,11 @@ function Map:draw()
                 love.graphics.rectangle("fill", (i)*self.row_length - self.row_length/5, (j-1)*self.col_length, self.row_length/5, self.col_length/10)
                 love.graphics.rectangle("fill", (i)*self.row_length - self.row_length/10, (j-1)*self.col_length, self.row_length/10, self.col_length/5)
 
-                love.graphics.rectangle("fill", (i-1)*self.row_length - self.row_length/5, (j)*self.col_length - self.col_length/10, self.row_length/5, self.col_length/10)
-                love.graphics.rectangle("fill", (i-1)*self.row_length - self.row_length/10, (j)*self.col_length, self.row_length/10, self.col_length/5)
+                love.graphics.rectangle("fill", (i-1)*self.row_length, (j)*self.col_length - self.col_length/10, self.row_length/5, self.col_length/10)
+                love.graphics.rectangle("fill", (i-1)*self.row_length, (j)*self.col_length - self.col_length/5, self.row_length/10, self.col_length/5)
+
+                love.graphics.rectangle("fill", (i)*self.row_length - self.row_length/5, (j)*self.col_length - self.col_length/10, self.row_length/5, self.col_length/10)
+                love.graphics.rectangle("fill", (i)*self.row_length - self.row_length/10, (j)*self.col_length - self.col_length/5, self.row_length/10, self.col_length/5)
             end
         end
     end
