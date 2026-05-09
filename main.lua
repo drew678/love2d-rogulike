@@ -45,10 +45,8 @@ function love.load()
     player.y = y
     map:addObject(player)
     Fov.computeFOV(map, player.x, player.y, 5)
-
-   
-
-    Ui.test()
+    
+    Ui.test(width, height)
 end
 
 function love.resize(w, h)
