@@ -10,18 +10,10 @@ TAMeta = {}
 TAMeta.__index = TeleportAbility
 
 function TeleportAbility.new()
-    local self = {}
+    local self = Ability.new("Teleport",100,100)
     setmetatable(self, TAMeta)
 
-    self.cost = 2
     return self
 end
 
 return TeleportAbility
-
-
-
-
-local ta = TeleportAbility.new()
-
-ta.getCost()

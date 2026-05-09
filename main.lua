@@ -6,6 +6,7 @@ Actor = require("actor")
 GameStates = require("gameStates")
 loveli = require("LOVELi")
 Ui = require("ui")
+Test = require("test")
 width, height, flags = love.window.getMode()
 timer = 0
 grid = {}
@@ -129,6 +130,9 @@ function love.update(dt)
             currentGameState = GameStates.WAITING
         end
     end
+
+    Test.testInput()
+
     Input.update()
 end
 
@@ -206,6 +210,9 @@ end
 --     end
 --     Input.update() --update input states each frame        
 -- end
+function getInput()
+    
+end
 
 function getMovementInput()
     local isTryingMove = false

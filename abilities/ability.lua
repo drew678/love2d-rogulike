@@ -15,7 +15,11 @@ function Ability:activate(actor)
 end
 
 function Ability:getCost()
-    return self.manaCost
+    return self.timeCost
+end
+
+function Ability:getTimeCost()
+    return self.timeCost
 end
 
 return Ability
