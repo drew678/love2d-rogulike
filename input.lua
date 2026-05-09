@@ -58,7 +58,7 @@ function Input.keyreleased(key)
     if Input.keysDown[key] then
         Input.num_down = Input.num_down - 1
     end
-    if Input.keyreleased[key] then
+    if Input.keysReleased[key] then
         Input.num_released = Input.num_released + 1
     end
     Input.keysDown[key] = false
