@@ -67,6 +67,9 @@ function love.update(dt)
         end
 
         if isTryingMove then
+            local target = {}
+            target.x = player.x + direction.x
+            target.y = player.y + direction.y
             if(map:move(player, direction)) then
                 currentGameState = GameStates.SIMULATING
             end

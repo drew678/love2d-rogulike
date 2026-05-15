@@ -78,17 +78,10 @@ function Map:addObject(object)
     end
 end
 
-function Map:move(mover, direction)
-    local target = {} --target move location
-    target.x = mover.x + direction.x
-    target.y = mover.y + direction.y
-
+function Map:move(mover, target)
     if(self:isInBounds(target.x, target.y)) then --out of bounds check
         if(self.grid[target.x][target.y].object.type == "empty") then --empty space check
-            self.grid[mover.x][mover.y].object = {type = "empty"}
-            mover.x = target.x
-            mover.y = target.y
-            self.grid[mover.x][mover.y].object = mover
+            Map:Basicmove(mover, target)
             return true
         else
             mover:attack(self.grid[target.x][target.y].object) --attack
@@ -97,6 +90,15 @@ function Map:move(mover, direction)
     else
         return false
     end
+end
+
+function Map:Basicmove(mover, target)
+    assert(self:isInBounds(target.x, target.y), "Attempted to move to out of bounds location")
+    assert(self.grid[target.x][target.y].object.type == "empty", "Attempted to move to non-empty location")
+    self.grid[mover.x][mover.y].object = {type = "empty"}
+    mover.x = target.x
+    mover.y = target.y
+    self.grid[mover.x][mover.y].object = mover
 end
 
 function Map:isBlocked(x, y)

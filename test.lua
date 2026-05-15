@@ -4,6 +4,9 @@ Input = require("input")
 local teleport_down = false
 
 function Test.testInput()
+    if(Input.wasActionPressed("moveNowhere")) then
+        print("Move nowhere action was just pressed.")
+    end
     if (Input.isActionDown("teleport")) then
         if teleport_down == false then
             print("Teleport action is now being held down.")

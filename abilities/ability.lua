@@ -10,7 +10,14 @@ function Ability.new(name, timeCost, manaCost)
     return self
 end
 
-function Ability:activate(actor)
+function Ability:keypress(actor, target)
+    if(actor.stats.mana >= self.manaCost) then
+        actor.stats.mana = actor.stats.mana - self.manaCost
+        return true
+    else
+        print("Not enough mana to use " .. self.name)
+        return false
+    end
 
 end
 

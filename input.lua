@@ -87,6 +87,7 @@ Input.actions = {
     -- for example: {{"a",  "b"}, {}} is bad, because the second inner list is empty.
 
     -- Movement: numpad and vi keys
+    moveNowhere = {{}},
     moveNorth = {{"up"}, {"kp8"}},
     moveSouth = {{"down"}, {"kp2"}},
     moveWest = {{"left"}, {"kp4"}},
