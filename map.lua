@@ -39,10 +39,10 @@ end
 --doesn't work
 function Map:generateEmptyMap()
     --desert/empty
-    for i = 1, num_cols do
+    for i = 1, self.num_cols do
         self.grid[i] = {}
-        for j = 1, num_rows do
-            self.grid[i][j].object = {id = "empty"}
+        for j = 1, self.num_rows do
+            self.grid[i][j] = {object = {type = "empty"}, visibility = "unseen"}
         end
     end
 end
@@ -81,7 +81,7 @@ end
 function Map:move(mover, target)
     if(self:isInBounds(target.x, target.y)) then --out of bounds check
         if(self.grid[target.x][target.y].object.type == "empty") then --empty space check
-            Map:Basicmove(mover, target)
+            self:basicMove(mover, target)
             return true
         else
             mover:attack(self.grid[target.x][target.y].object) --attack
@@ -92,9 +92,9 @@ function Map:move(mover, target)
     end
 end
 
-function Map:Basicmove(mover, target)
-    assert(self:isInBounds(target.x, target.y), "Attempted to move to out of bounds location")
-    assert(self.grid[target.x][target.y].object.type == "empty", "Attempted to move to non-empty location")
+function Map:basicMove(mover, target)
+    -- assert(self:isInBounds(target.x, target.y), "Attempted to move to out of bounds location")
+    -- assert(self.grid[target.x][target.y].object.type == "empty", "Attempted to move to non-empty location")
     self.grid[mover.x][mover.y].object = {type = "empty"}
     mover.x = target.x
     mover.y = target.y

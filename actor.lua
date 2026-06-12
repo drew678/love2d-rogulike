@@ -12,7 +12,20 @@ function Actor.new(x, y, id, type, map)
     newActor.stats = Stats.new(type)
     newActor.id = id
     newActor.map = map
+    newActor.abilities = {}
     return newActor
+end
+
+function Actor:addAbility(name, ability)
+    self.abilities[name] = ability
+end
+
+function Actor:hasAbility(name)
+    return self.abilities[name] ~= nil
+end
+
+function Actor:getAbility(name)
+    return self.abilities[name]
 end
 
 function Actor:attack(target)

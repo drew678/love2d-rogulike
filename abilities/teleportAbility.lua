@@ -1,4 +1,4 @@
-Ability = require("ability")
+Ability = require("abilities/ability")
 Map = require("map")
 
 ParentMeta = {}
@@ -11,20 +11,32 @@ TAMeta = {}
 TAMeta.__index = TeleportAbility
 
 function TeleportAbility.new()
-    local self = Ability.new("Teleport",100,100)
+    local self = Ability.new("Teleport",100,100,100,"target")
     setmetatable(self, TAMeta)
 
     return self
 end
 
 function TeleportAbility:keypress(actor, target)
-    if(Ability.keypress(self, actor, target)) then
-        if(actor.map:isInBounds(target.x, target.y) and actor.map.grid[target.x][target.y].object.type == "empty") then
-            actor.map:Basicmove(actor, target)
-        else
-            print("Invalid teleport location")
-        end
+    return self:use(actor, target)
+end
+
+function TeleportAbility:activate(actor, target, map)
+    if not actor or not actor.map or not target then
+        return false
     end
+
+    if not actor.map:isInBounds(target.x, target.y) then
+        print("Invalid teleport location")
+        return false
+    end
+
+    if actor.map.grid[target.x][target.y].object.type ~= "empty" then
+        print("Invalid teleport location")
+        return false
+    end
+
+    return map:basicMove(actor, target)
 end
 
 return TeleportAbility

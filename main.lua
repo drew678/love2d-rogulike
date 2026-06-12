@@ -1,4 +1,5 @@
 Input = require("input")
+TeleportAbility = require("abilities/teleportAbility")
 Map = require("map")
 Fov = require("fov")
 Scheduler = require("scheduler")
@@ -6,7 +7,6 @@ Actor = require("actor")
 GameStates = require("gameStates")
 loveli = require("LOVELi")
 Ui = require("ui")
-Test = require("test")
 width, height, flags = love.window.getMode()
 timer = 0
 grid = {}
@@ -15,6 +15,7 @@ gameOver = false
 
 
 local currentGameState = GameStates.WAITING
+local currentAbility = nil
 
 --there are 2 different coordinate systems in game
 --pixels on screen
@@ -37,6 +38,7 @@ function love.load()
 
     --player init
     player = Actor.new(0, 0, "player", "player", map)
+    player:addAbility("teleport", TeleportAbility.new())
     Scheduler:schedule(player, 0, player.stats.speed)
     local x, y, found = map:getrandomEmptyCell()
     if(not found) then
@@ -56,7 +58,7 @@ end
 
 function love.update(dt)
     layoutmanager:update(dt)
-    if currentGameState == GameStates.WAITING then
+    if currentGameState == GameStates.WAITING then--check for input
         local isTryingMove = false
         local direction = {}
         isTryingMove, direction = getMovementInput()
@@ -66,15 +68,30 @@ function love.update(dt)
             map:setTarget({x = player.x, y = player.y})
         end
 
+        if Input.wasActionPressed("teleport") and not isTryingMove and player:hasAbility("teleport") then
+            currentAbility = player:getAbility("teleport")
+            print("Selected ability: " .. currentAbility.name)
+            currentGameState = GameStates.TARGETING
+            map:setTarget({x = player.x, y = player.y})
+        end
+        
         if isTryingMove then
             local target = {}
             target.x = player.x + direction.x
             target.y = player.y + direction.y
-            if(map:move(player, direction)) then
+            if(map:move(player, target)) then
                 currentGameState = GameStates.SIMULATING
             end
         end
     elseif currentGameState == GameStates.TARGETING then
+        print("Selected ability: " .. currentAbility.name)
+        if(currentAbility.name == "Teleport") then
+            if(Input.wasActionPressed("confirm")) then
+                print("Activating teleport ability")
+                currentAbility:activate(player, map.target, map)
+                currentGameState = GameStates.SIMULATING
+            end
+        end
         local isTryingMove = false
         local direction = {}
         isTryingMove, direction = getMovementInput()
@@ -111,7 +128,10 @@ function love.update(dt)
                 else
                     enemyDirection.y = -1
                 end
-                map:move(actor, enemyDirection)
+                local enemyTarget = {}
+                enemyTarget.x = actor.x + enemyDirection.x
+                enemyTarget.y = actor.y + enemyDirection.y
+                map:move(actor, enemyTarget)
                 Scheduler:schedule(actor, time+100, actor.stats.speed) --we need to change that 100 to be based on action cost
             else
                 currentGameState = GameStates.DELAY
@@ -133,8 +153,6 @@ function love.update(dt)
             currentGameState = GameStates.WAITING
         end
     end
-
-    Test.testInput()
 
     Input.update()
 end
