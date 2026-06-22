@@ -84,12 +84,16 @@ function love.update(dt)
             end
         end
     elseif currentGameState == GameStates.TARGETING then
-        print("Selected ability: " .. currentAbility.name)
-        if(currentAbility.name == "Teleport") then
+        if currentAbility then
             if(Input.wasActionPressed("confirm")) then
-                print("Activating teleport ability")
-                currentAbility:activate(player, map.target, map)
-                currentGameState = GameStates.SIMULATING
+                print("Activated ability: " .. currentAbility.name)
+                local success = currentAbility:activate(player, map.target, map)
+                if success then
+                    map:removeTarget()
+                    currentGameState = GameStates.SIMULATING
+                else
+                    print("Failed to activate ability")
+                end
             end
         end
         local isTryingMove = false

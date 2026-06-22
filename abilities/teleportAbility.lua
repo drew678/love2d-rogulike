@@ -36,7 +36,8 @@ function TeleportAbility:activate(actor, target, map)
         return false
     end
 
-    return map:basicMove(actor, target)
+    map:basicMove(actor, target)
+    return true
 end
 
 return TeleportAbility
