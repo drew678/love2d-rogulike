@@ -11,14 +11,10 @@ TAMeta = {}
 TAMeta.__index = TeleportAbility
 
 function TeleportAbility.new()
-    local self = Ability.new("Teleport",100,100,100,"target")
-    setmetatable(self, TAMeta)
-
+    local self = setmetatable({}, TAMeta)
+    self.name = "teleport"
+    self:initFromJson()
     return self
-end
-
-function TeleportAbility:keypress(actor, target)
-    return self:use(actor, target)
 end
 
 function TeleportAbility:activate(actor, target, map)

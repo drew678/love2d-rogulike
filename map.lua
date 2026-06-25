@@ -188,4 +188,23 @@ function Map:draw()
     love.graphics.setColor({1,1,1})
 end
 
+function Map:isSolid(x, y)
+    if not self:isInBounds(x, y) then
+        return true
+    end
+    local obj = self.grid[x][y].object
+    return obj.type == "tree" or obj.type == "enemy" or obj.type == "player"
+end
+
+function Map:getActorAt(x, y)
+    if not self:isInBounds(x, y) then
+        return nil
+    end
+    local obj = self.grid[x][y].object
+    if obj.type == "enemy" or obj.type == "player" then
+        return obj
+    end
+    return nil
+end
+
 return Map

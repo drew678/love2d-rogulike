@@ -1,43 +1,50 @@
 local Ability = {}
+local json = require ("dkjson")
+
 
 Ability.__index = Ability
 
-function Ability.new(name, timeCost, manaCost, cooldown, targetType)
-    local self = setmetatable({}, Ability)
-    self.name = name
-    self.timeCost = timeCost
-    self.manaCost = manaCost
-    self.cooldown = cooldown
-    self.cooldownRemaining = 0
-    self.targetType = targetType
+function Ability:initFromJson()
+    local game_files = love.filesystem.getSource( )
+    local file_path = game_files .. "/" .. "game_data/abilities.json"
+    local file = io.open(file_path)
 
-    return self
+    if(not file) then
+        error("Stats file not found")
+    end
+    local contents = file:read("*a")
+    file:close()
+    local data = json.decode(contents)
+
+    self.timeCost = data[self.name].timeCost
+    self.manaCost = data[self.name].manaCost
+    self.cooldown = data[self.name].cooldown
+    self.targetType = data[self.name].targetType
+    self.onCooldownUntil = 0
+    return data
 end
 
-function Ability:keypress(actor, target)
-    return self:use(actor, target)
-end
-
-function Ability:canUse(actor)
-    return actor.stats.mana >= self.manaCost and self.cooldownRemaining <= 0
-end
-
-function Ability:payCost(actor)
-    actor.stats.mana = actor.stats.mana - self.manaCost
-end
-
-function Ability:use(actor, target)
-    if not self:canUse(actor) then
-        print("Not enough mana to use " .. self.name)
+function Ability:canUse(actor, currentTime)
+    if(actor.stats.mana < self.manaCost) then
+        print(actor.type .. " does not have enough mana to use " .. self.name .. ". Required: " .. self.manaCost .. ", Available: " .. actor.stats.mana)
+        return false
+    elseif self.onCooldownUntil > currentTime then
+        print(actor.type .. " is not ready to use " .. self.name .. " yet. Cooldown remaining: " .. (self.onCooldownUntil - currentTime))
         return false
     end
-
-    self:payCost(actor)
-    self.cooldownRemaining = self.cooldown
-    return self:activate(actor, target)
+    return true
 end
 
-function Ability:activate(actor, target)
+function Ability:use(actor, target, map, currentTime)
+    if not self:canUse(actor, currentTime) then
+        return false
+    end
+    actor.stats.mana = actor.stats.mana - self.manaCost
+    self.onCooldownUntil = currentTime + self.cooldown
+    return self:activate(actor, target, map)
+end
+
+function Ability:activate(actor, target, map)
     return false
 end
 

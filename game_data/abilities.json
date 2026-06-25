@@ -1,0 +1,20 @@
+{
+  "teleport": {
+    "timeCost": 100,
+    "manaCost": 30,
+    "cooldown": 200,
+    "cooldownRemaining": 0,
+    "targetType": "target",
+    "damage": 20,
+    "range": 6
+  },
+  "fireball": {
+    "timeCost": 100,
+    "manaCost": 30,
+    "cooldown": 200,
+    "cooldownRemaining": 0,
+    "targetType": "directional",
+    "damage": 20,
+    "range": 6
+  }
+}

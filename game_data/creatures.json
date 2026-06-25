@@ -1,0 +1,18 @@
+{
+  "enemy": {
+    "maxHp": 10,
+    "attack": 1,
+    "speed": 100,
+    "maxMana": 20,
+    "manaRegen": 0.01,
+    "healthRegen": 0.001
+  },
+  "player": {
+    "maxHp": 100,
+    "attack": 10,
+    "speed": 100,
+    "maxMana": 100,
+    "manaRegen": 0.01,
+    "healthRegen": 0.001
+  }
+}

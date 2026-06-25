@@ -95,6 +95,7 @@ Input.actions = {
     quit = {"escape", "q"},
     -- this is where we assign keys to actions, we can add more actions and keys as needed
     teleport = {"t"},
+    fireball = {"f"},
 }
 
 function Input.addAction(action, keys)

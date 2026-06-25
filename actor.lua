@@ -13,6 +13,8 @@ function Actor.new(x, y, id, type, map)
     newActor.id = id
     newActor.map = map
     newActor.abilities = {}
+    newActor.lastRegenTime = 0
+    newActor:addAbility("teleport", TeleportAbility.new()) 
     return newActor
 end
 
@@ -26,6 +28,14 @@ end
 
 function Actor:getAbility(name)
     return self.abilities[name]
+end
+
+function Actor:regenerate(time)
+    print(self.type .. " regenerating. Current HP: " .. self.stats.hp .. ", Current Mana: " .. self.stats.mana)
+    local timeElapsed = time - self.lastRegenTime
+    self.stats.mana = math.min(self.stats.mana + self.stats.manaRegen *timeElapsed, self.stats.maxMana)
+    self.stats.hp = math.min(self.stats.hp + self.stats.healthRegen *timeElapsed, self.stats.maxHp)
+    self.lastRegenTime = time
 end
 
 function Actor:attack(target)
