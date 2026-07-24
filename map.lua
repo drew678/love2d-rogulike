@@ -192,6 +192,8 @@ function Map:isSolid(x, y)
     if not self:isInBounds(x, y) then
         return true
     end
+    x = math.floor(x)
+    y = math.floor(y)
     local obj = self.grid[x][y].object
     return obj.type == "tree" or obj.type == "enemy" or obj.type == "player"
 end

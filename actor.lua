@@ -40,12 +40,16 @@ end
 
 function Actor:attack(target)
     if((self.type == "player" and target.type == "enemy") or (self.type == "enemy" and target.type == "player")) then --allegiance check
-        target.stats.hp = target.stats.hp - self.stats.attack-- change this to a take damage function
-        print(self.type .. " attacked " .. target.type .. " for " .. self.stats.attack .. " damage. " .. target.type .. " has " .. target.stats.hp .. " hp left.")
-        if(target.stats.hp <= 0) then
-            print(target.type .. " has died.")
-            self.map.grid[target.x][target.y].object = {type = "empty"}-- you should make a function for this in map, like map:removeObject(target)
-        end
+        target:takeDamage(self.stats.attack)
+    end
+end
+
+function Actor:takeDamage(amount)
+    self.stats.hp = self.stats.hp - amount
+    print(self.type .. " took " .. amount .. " damage. Current HP: " .. self.stats.hp)
+    if self.stats.hp <= 0 then
+        print(self.type .. " has died.")
+        self.map.grid[self.x][self.y].object = {type = "empty"}
     end
 end
 

@@ -118,18 +118,25 @@ function love.update(dt)
             currentGameState = GameStates.WAITING
             map:removeTarget()
         end
-    elseif currentGameState == GameStates.SIMULATING then
+        if(#projectiles > 0) then
+            currentGameState = GameStates.PROJECTILE
+        end
+    elseif currentGameState == GameStates.PROJECTILE then
         --update projectiles
-        for i = #projectiles, 1, -1 do
-            if projectiles[i]:update(map) then
-                table.remove(projectiles, i)
+        while(#projectiles > 0) do
+            for i = #projectiles, 1, -1 do
+                if projectiles[i]:update(map, dt) then
+                    table.remove(projectiles, i)
+                end
             end
         end
-        
+    elseif currentGameState == GameStates.SIMULATING then
         --simulate all actors until we get back to the player
         while true do
             local time, actor = Scheduler:pop()
-            
+            if(actor.stats.hp <= 0) then
+                goto continue
+            end
             actor:regenerate(time)
             if(actor.type ~= "player") then
                 if(actor.stats.hp <= 0) then

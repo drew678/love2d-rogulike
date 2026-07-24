@@ -5,7 +5,7 @@
     "speed": 100,
     "maxMana": 20,
     "manaRegen": 0.01,
-    "healthRegen": 0.001
+    "healthRegen": 1
   },
   "player": {
     "maxHp": 100,
