@@ -28,6 +28,7 @@ function Map:moveTarget(direction)
         self.target.x = self.target.x + direction.x
         self.target.y = self.target.y + direction.y
     end
+    print("Target moved to: (" .. self.target.x .. ", " .. self.target.y .. ")")
 end
 
 function Map:removeTarget()
@@ -55,7 +56,7 @@ function Map:generateForestMap()
             local tile = {object = {type = "empty"}, visibility = "unseen"}
             self.grid[i][j] = tile
             
-            if(math.random() < 0.125) then
+            if(math.random() < 0.01) then
                 self.grid[i][j].object = {type = "tree"}
             elseif(math.random() < 0.01) then
                 local enemy = Actor.new(i, j, "enemy", "enemy", self)

@@ -19,22 +19,15 @@ function FireballAbility:activate(actor, targetPos, map, currentTime)
     local dx = targetPos.x - actor.x
     local dy = targetPos.y - actor.y
     
-    -- Normalize direction
-    local dirX = 0
-    local dirY = 0
-    
-    if dx > 0 then dirX = 1 elseif dx < 0 then dirX = -1 end
-    if dy > 0 then dirY = 1 elseif dy < 0 then dirY = -1 end
-    
-    if dirX == 0 and dirY == 0 then
+    if dx == 0 and dy == 0 then
         print("Cannot cast fireball at own position")
         return false
     end
 
     -- Create and add projectile
-    table.insert(projectiles, Projectile.new(math.floor(actor.x), math.floor(actor.y), dirX, dirY, self.speed, self.damage, self.range, actor))
+    table.insert(projectiles, Projectile.new(math.floor(actor.x), math.floor(actor.y), dx, dy, self.speed, self.damage, self.range, actor))
     
-    print(actor.type .. " cast " .. self.name .. " in direction (" .. dirX .. ", " .. dirY .. ")")
+    print(actor.type .. " cast " .. self.name .. " at location (" .. dx .. ", " .. dy .. ")")
     return true
 end
 

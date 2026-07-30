@@ -67,6 +67,7 @@ function love.update(dt)
         local direction = {}
         isTryingMove, direction = getMovementInput()
         
+
         if Input.wasActionPressed("look") and not isTryingMove then
             currentGameState = GameStates.TARGETING
             map:setTarget({x = player.x, y = player.y})
@@ -123,9 +124,9 @@ function love.update(dt)
         end
     elseif currentGameState == GameStates.PROJECTILE then
         --update projectiles
-        while(#projectiles > 0) do
+        if(#projectiles > 0) then
             for i = #projectiles, 1, -1 do
-                if projectiles[i]:update(map, dt) then
+                if projectiles[i]:update(map) then
                     table.remove(projectiles, i)
                 end
             end

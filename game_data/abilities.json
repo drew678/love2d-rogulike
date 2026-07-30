@@ -13,6 +13,7 @@
     "cooldown": 0,
     "targetType": "directional",
     "damage": 20,
-    "range": 6
+    "range": 6,
+    "speed": 1
   }
 }

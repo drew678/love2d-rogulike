@@ -45,6 +45,7 @@ function Actor:attack(target)
 end
 
 function Actor:takeDamage(amount)
+    print(self)
     self.stats.hp = self.stats.hp - amount
     print(self.type .. " took " .. amount .. " damage. Current HP: " .. self.stats.hp)
     if self.stats.hp <= 0 then
@@ -52,6 +53,7 @@ function Actor:takeDamage(amount)
         self.map.grid[self.x][self.y].object = {type = "empty"}
     end
 end
+
 
 function Actor:gethp()
     return self.stats.hp
