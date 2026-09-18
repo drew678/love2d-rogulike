@@ -58,8 +58,14 @@ function Map:generateForestMap()
             
             if(math.random() < 0.01) then
                 self.grid[i][j].object = {type = "tree"}
-            elseif(math.random() < 0.01) then
+            elseif(math.random() < 0.005) then
+                print("Creating enemy at (" .. i .. ", " .. j .. ")")
                 local enemy = Actor.new(i, j, "enemy", "enemy", self)
+                Scheduler:push(0, enemy)
+                self.grid[i][j].object = enemy
+            elseif(math.random() < 0.005) then
+                print("Creating ranged enemy at (" .. i .. ", " .. j .. ")")
+                local enemy = Actor.new(i, j, "enemy", "ranged enemy", self)
                 Scheduler:push(0, enemy)
                 self.grid[i][j].object = enemy
             else
@@ -150,6 +156,10 @@ local function gridCoordstoScreen(dimension, axis)
     return (dimension*axis) - axis/2
 end
 
+function Map:gridToscreen(x, y)
+    return gridCoordstoScreen(x, self.row_length), gridCoordstoScreen(y, self.col_length)
+end
+
 function Map:draw()
     for i = 1, self.num_cols do
         for j = 1, self.num_rows do
@@ -159,6 +169,9 @@ function Map:draw()
                     love.graphics.rectangle("fill", (i-1)*self.row_length, (j-1)*self.col_length, self.row_length, self.col_length)
                 elseif(self.grid[i][j].object.type == "enemy") then
                     love.graphics.setColor({1,0,0})--enemies
+                    love.graphics.circle("fill", gridCoordstoScreen(i, self.row_length), gridCoordstoScreen(j, self.col_length), math.min(self.row_length/2, self.col_length/2))
+                elseif(self.grid[i][j].object.type == "ranged enemy") then
+                    love.graphics.setColor({1.0,0.5,0})--ranged enemies
                     love.graphics.circle("fill", gridCoordstoScreen(i, self.row_length), gridCoordstoScreen(j, self.col_length), math.min(self.row_length/2, self.col_length/2))
                 elseif(self.grid[i][j].object.type == "player") then
                     love.graphics.setColor({1,1,1})--player

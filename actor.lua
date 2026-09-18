@@ -1,5 +1,9 @@
 local Actor = {}
-local Stats = require("stats")
+local Json = require ("dkjson")
+local AbilityTable = {
+    --teleport = require("abilities/teleportAbility"),
+    fireball = require("abilities/fireballAbility")
+}
 
 Actor.__index = Actor
 
@@ -14,9 +18,35 @@ function Actor.new(x, y, id, type, map)
     newActor.map = map
     newActor.abilities = {}
     newActor.lastRegenTime = 0
-    newActor:addAbility("teleport", TeleportAbility.new()) 
+
+    local game_files = love.filesystem.getSource( )
+    local file_path = game_files .. "/" .. "game_data/creatures.json"
+    local file = io.open(file_path)
+
+    if(not file) then
+        error("Stats file not found")
+    end
+    local contents = file:read("*a")
+    file:close()
+    local data = Json.decode(contents)
+    newActor.maxHp = data[type].maxHp
+    newActor.hp = newActor.maxHp
+    newActor.maxMana = data[type].maxMana
+    newActor.mana = newActor.maxMana
+    newActor.attack = data[type].attack
+    newActor.speed = data[type].speed
+    newActor.healthRegen = data[type].healthRegen
+    newActor.manaRegen = data[type].manaRegen
+    newActor.faction = data[type].faction
+
+    for i, abilityName in ipairs(data[type].abilities) do
+        local Ability = AbilityTable[abilityName]
+        newActor:addAbility(abilityName, Ability.new(ability))
+    end
+
     return newActor
 end
+
 
 function Actor:addAbility(name, ability)
     self.abilities[name] = ability
@@ -39,7 +69,7 @@ function Actor:regenerate(time)
 end
 
 function Actor:attack(target)
-    if((self.type == "player" and target.type == "enemy") or (self.type == "enemy" and target.type == "player")) then --allegiance check
+    if((self.faction == "player" and target.faction == "enemy") or (self.faction == "enemy" and target.faction == "player")) then --allegiance check
         target:takeDamage(self.stats.attack)
     end
 end

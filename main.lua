@@ -130,6 +130,8 @@ function love.update(dt)
                     table.remove(projectiles, i)
                 end
             end
+        else
+            currentGameState = GameStates.SIMULATING
         end
     elseif currentGameState == GameStates.SIMULATING then
         --simulate all actors until we get back to the player

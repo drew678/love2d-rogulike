@@ -5,7 +5,19 @@
     "speed": 100,
     "maxMana": 20,
     "manaRegen": 0.01,
-    "healthRegen": 1
+    "healthRegen": 1,
+    "abilities": [],
+    "faction": "enemy"
+  },
+  "ranged enemy": {
+    "maxHp": 10,
+    "attack": 1,
+    "speed": 100,
+    "maxMana": 20,
+    "manaRegen": 0.01,
+    "healthRegen": 1,
+    "abilities": ["fireball"],
+    "faction": "enemy"
   },
   "player": {
     "maxHp": 100,
@@ -13,6 +25,8 @@
     "speed": 100,
     "maxMana": 100,
     "manaRegen": 0.01,
-    "healthRegen": 0.001
+    "healthRegen": 0.001,
+    "abilities": ["teleport", "fireball"],
+    "faction": "player"
   }
 }

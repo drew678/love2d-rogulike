@@ -70,7 +70,16 @@ function Input.wasReleased(key)
     return Input.keysReleased[key] or false
 end
 
+function Input.addAction(action, keys)
+    Input.actions[action] = keys
+end
+
+function Input.removeAction(action)
+    Input.actions[action] = nil
+end
+
 -- Example: map actions to keys
+-- makes it so you know the name of what the player character wants to do
 Input.actions = {
     --
     moveNowhere = {},

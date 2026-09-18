@@ -25,7 +25,7 @@ function FireballAbility:activate(actor, targetPos, map, currentTime)
     end
 
     -- Create and add projectile
-    table.insert(projectiles, Projectile.new(math.floor(actor.x), math.floor(actor.y), dx, dy, self.speed, self.damage, self.range, actor))
+    table.insert(projectiles, Projectile.new(actor.x, actor.y, dx, dy, self.speed, self.damage, self.range, actor))
     
     print(actor.type .. " cast " .. self.name .. " at location (" .. dx .. ", " .. dy .. ")")
     return true
