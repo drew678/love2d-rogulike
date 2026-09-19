@@ -17,6 +17,14 @@ function Map.new(num_rows, num_cols, row_length, col_length)
     return newMap
 end
 
+Map.GameObjectType = {
+    CREATURE = "creature",
+    ITEM = "item",
+    WALL = "wall",
+    FLOOR = "floor",
+    HAZARD = "hazard"
+}
+
 function Map:setTarget(target)
     self.target.x = target.x
     self.target.y = target.y
@@ -48,6 +56,13 @@ function Map:generateEmptyMap()
     end
 end
 
+--this is for a draw wall
+function drawTree(wall, i, j, row_length, col_length)
+    love.graphics.setColor({0,1,0})--walls
+    love.graphics.rectangle("fill", (i-1)*row_length, (j-1)*col_length, row_length, col_length)
+end
+
+--added draw funciton in here
 function Map:generateForestMap()
     --forest generation
     for i = 1, self.num_cols do
@@ -55,17 +70,17 @@ function Map:generateForestMap()
         for j = 1, self.num_rows do
             local tile = {object = {type = "empty"}, visibility = "unseen"}
             self.grid[i][j] = tile
-            
             if(math.random() < 0.01) then
-                self.grid[i][j].object = {type = "tree"}
+                self.grid[i][j].object = {type = Map.GameObjectType.WALL}
+                self.grid[i][j].object.draw = drawTree
             elseif(math.random() < 0.005) then
                 print("Creating enemy at (" .. i .. ", " .. j .. ")")
-                local enemy = Actor.new(i, j, "enemy", "enemy", self)
+                local enemy = Actor.new(i, j, "enemy", self)
                 Scheduler:push(0, enemy)
                 self.grid[i][j].object = enemy
             elseif(math.random() < 0.005) then
                 print("Creating ranged enemy at (" .. i .. ", " .. j .. ")")
-                local enemy = Actor.new(i, j, "enemy", "ranged enemy", self)
+                local enemy = Actor.new(i, j, "ranged enemy", self)
                 Scheduler:push(0, enemy)
                 self.grid[i][j].object = enemy
             else
@@ -112,7 +127,7 @@ function Map:isBlocked(x, y)
     if(not self:isInBounds(x, y)) then
         return true
     end
-    return self.grid[x][y].object.type == "tree"
+    return self.grid[x][y].object.type == Map.GameObjectType.WALL
 end
 
 function Map:setVisible(x, y)
@@ -160,27 +175,58 @@ function Map:gridToscreen(x, y)
     return gridCoordstoScreen(x, self.row_length), gridCoordstoScreen(y, self.col_length)
 end
 
-function Map:draw()
+function Map:draw2()
     for i = 1, self.num_cols do
         for j = 1, self.num_rows do
             if(self.grid[i][j].visibility == "seeing") then
-                if(self.grid[i][j].object.type == "tree") then
+                if(self.grid[i][j].object.type == Map.GameObjectType.WALL) then
                     love.graphics.setColor({0,1,0})--walls
                     love.graphics.rectangle("fill", (i-1)*self.row_length, (j-1)*self.col_length, self.row_length, self.col_length)
-                elseif(self.grid[i][j].object.type == "enemy") then
+                elseif(self.grid[i][j].object.type == Map.GameObjectType.ENEMY) then
                     love.graphics.setColor({1,0,0})--enemies
                     love.graphics.circle("fill", gridCoordstoScreen(i, self.row_length), gridCoordstoScreen(j, self.col_length), math.min(self.row_length/2, self.col_length/2))
-                elseif(self.grid[i][j].object.type == "ranged enemy") then
+                elseif(self.grid[i][j].object.type == Map.GameObjectType.RANGED_ENEMY) then
                     love.graphics.setColor({1.0,0.5,0})--ranged enemies
                     love.graphics.circle("fill", gridCoordstoScreen(i, self.row_length), gridCoordstoScreen(j, self.col_length), math.min(self.row_length/2, self.col_length/2))
-                elseif(self.grid[i][j].object.type == "player") then
+                elseif(self.grid[i][j].object.type == Map.GameObjectType.PLAYER) then
                     love.graphics.setColor({1,1,1})--player
                     love.graphics.circle("fill", gridCoordstoScreen(i, self.row_length), gridCoordstoScreen(j, self.col_length), math.min(self.row_length/2, self.col_length/2))--player
                 end
             elseif(self.grid[i][j].visibility == "seen") then
-                if(self.grid[i][j].object.type == "tree") then
+                if(self.grid[i][j].object.type == Map.GameObjectType.WALL) then
                     love.graphics.setColor({0,0.5,0})--seen walls
                     love.graphics.rectangle("fill", (i-1)*self.row_length, (j-1)*self.col_length, self.row_length, self.col_length)
+                end
+            end
+            if(self.target.targeting and self.target.x == i and self.target.y == j) then
+                love.graphics.setColor({1,1,1})--targeting
+                love.graphics.rectangle("fill", (i-1)*self.row_length, (j-1)*self.col_length, self.row_length/5, self.col_length/10)
+                love.graphics.rectangle("fill", (i-1)*self.row_length, (j-1)*self.col_length, self.row_length/10, self.col_length/5)
+
+                love.graphics.rectangle("fill", (i)*self.row_length - self.row_length/5, (j-1)*self.col_length, self.row_length/5, self.col_length/10)
+                love.graphics.rectangle("fill", (i)*self.row_length - self.row_length/10, (j-1)*self.col_length, self.row_length/10, self.col_length/5)
+
+                love.graphics.rectangle("fill", (i-1)*self.row_length, (j)*self.col_length - self.col_length/10, self.row_length/5, self.col_length/10)
+                love.graphics.rectangle("fill", (i-1)*self.row_length, (j)*self.col_length - self.col_length/5, self.row_length/10, self.col_length/5)
+
+                love.graphics.rectangle("fill", (i)*self.row_length - self.row_length/5, (j)*self.col_length - self.col_length/10, self.row_length/5, self.col_length/10)
+                love.graphics.rectangle("fill", (i)*self.row_length - self.row_length/10, (j)*self.col_length - self.col_length/5, self.row_length/10, self.col_length/5)
+            end
+        end
+    end
+    love.graphics.setColor({1,1,1})
+end
+
+function Map:draw()
+    for i = 1, self.num_cols do
+        for j = 1, self.num_rows do
+            if(self.grid[i][j].object.type ~= "empty")then
+                if(self.grid[i][j].visibility == "seeing") then
+                    self.grid[i][j].object:draw(i, j, self.row_length, self.col_length)
+                elseif(self.grid[i][j].visibility == "seen") then
+                    if(self.grid[i][j].object.type == Map.GameObjectType.WALL) then
+                        self.grid[i][j].object:draw(i, j, self.row_length, self.col_length)
+                    end
                 end
             end
             if(self.target.targeting and self.target.x == i and self.target.y == j) then
@@ -217,7 +263,7 @@ function Map:getActorAt(x, y)
         return nil
     end
     local obj = self.grid[x][y].object
-    if obj.type == "enemy" or obj.type == "player" then
+    if obj.type == "enemy" or obj.type == "player" or obj.type == "ranged enemy" then
         return obj
     end
     return nil

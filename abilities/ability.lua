@@ -26,8 +26,8 @@ end
 
 function Ability:canUse(actor, currentTime)
     print(self.onCooldownUntil .. " vs " .. currentTime)
-    if(actor.stats.mana < self.manaCost) then
-        print(actor.type .. " does not have enough mana to use " .. self.name .. ". Required: " .. self.manaCost .. ", Available: " .. actor.stats.mana)
+    if(actor.mana < self.manaCost) then
+        print(actor.type .. " does not have enough mana to use " .. self.name .. ". Required: " .. self.manaCost .. ", Available: " .. actor.mana)
         return false
     elseif self.onCooldownUntil > currentTime then
         print(actor.type .. " is not ready to use " .. self.name .. " yet. Cooldown remaining: " .. (self.onCooldownUntil - currentTime))
@@ -43,7 +43,7 @@ function Ability:use(actor, target, map, currentTime)
 
     local worked = self:activate(actor, target, map, currentTime)
     if(worked) then
-        actor.stats.mana = actor.stats.mana - self.manaCost
+        actor.mana = actor.mana - self.manaCost
         self.onCooldownUntil = currentTime + self.cooldown
     end
     return worked

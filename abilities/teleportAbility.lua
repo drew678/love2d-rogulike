@@ -1,5 +1,4 @@
 Ability = require("abilities/ability")
-Map = require("map")
 
 ParentMeta = {}
 ParentMeta.__index = Ability

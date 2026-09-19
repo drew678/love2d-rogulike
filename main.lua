@@ -40,10 +40,10 @@ function love.load()
     map:generateForestMap()
 
     --player init
-    player = Actor.new(0, 0, "player", "player", map)
+    player = Actor.new(0, 0, "player", map)
     player:addAbility("teleport", TeleportAbility.new())
     player:addAbility("fireball", FireballAbility.new())
-    Scheduler:schedule(player, 0, player.stats.speed)
+    Scheduler:schedule(player, 0, player.speed)
     local x, y, found = map:getrandomEmptyCell()
     if(not found) then
         error("No empty cell found for player")
@@ -137,12 +137,12 @@ function love.update(dt)
         --simulate all actors until we get back to the player
         while true do
             local time, actor = Scheduler:pop()
-            if(actor.stats.hp <= 0) then
+            if(actor.hp <= 0) then
                 goto continue
             end
             actor:regenerate(time)
             if(actor.type ~= "player") then
-                if(actor.stats.hp <= 0) then
+                if(actor.hp <= 0) then
                     goto continue
                 end
                 local enemyDirection = {}
@@ -166,15 +166,15 @@ function love.update(dt)
                 enemyTarget.x = actor.x + enemyDirection.x
                 enemyTarget.y = actor.y + enemyDirection.y
                 map:move(actor, enemyTarget)
-                Scheduler:schedule(actor, time+100, actor.stats.speed) --we need to change that 100 to be based on action cost
+                Scheduler:schedule(actor, time+100, actor.speed) --we need to change that 100 to be based on action cost
             else
                 playerTime = time
                 currentGameState = GameStates.DELAY
-                if(actor.stats.hp <= 0) then
+                if(actor.hp <= 0) then
                     currentGameState = GameStates.GAMEOVER
                     print("Game Over!")
                 end
-                Scheduler:schedule(actor, time+100, actor.stats.speed)
+                Scheduler:schedule(actor, time+100, actor.speed)
                 break
             end
             ::continue::

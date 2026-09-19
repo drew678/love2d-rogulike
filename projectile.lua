@@ -82,8 +82,8 @@ function Projectile:update(map)
     if hit and hit ~= self.owner then
         -- Deal damage to the hit actor
         hit:takeDamage(self.damage)
-        print(self.owner.type .. "'s projectile hit " .. hit.type .. " for " .. self.damage .. " damage. " .. hit.type .. " has " .. hit.stats.hp .. " hp left.")
-        if hit.stats.hp <= 0 then
+        print(self.owner.type .. "'s projectile hit " .. hit.type .. " for " .. self.damage .. " damage. " .. hit.type .. " has " .. hit.hp .. " hp left.")
+        if hit.hp <= 0 then
             print(hit.type .. " has died.")
             map.grid[hit.x][hit.y].object = {type = "empty"}
         end

@@ -1,32 +1,35 @@
 {
   "enemy": {
     "maxHp": 10,
-    "attack": 1,
+    "damage": 1,
     "speed": 100,
     "maxMana": 20,
     "manaRegen": 0.01,
     "healthRegen": 1,
     "abilities": [],
-    "faction": "enemy"
+    "faction": "enemy",
+    "color": [1, 0, 0]
   },
   "ranged enemy": {
     "maxHp": 10,
-    "attack": 1,
+    "damage": 1,
     "speed": 100,
     "maxMana": 20,
     "manaRegen": 0.01,
     "healthRegen": 1,
     "abilities": ["fireball"],
-    "faction": "enemy"
+    "faction": "enemy",
+    "color": [1, 0.5, 0]
   },
   "player": {
     "maxHp": 100,
-    "attack": 10,
+    "damage": 10,
     "speed": 100,
     "maxMana": 100,
     "manaRegen": 0.01,
     "healthRegen": 0.001,
     "abilities": ["teleport", "fireball"],
-    "faction": "player"
+    "faction": "player",
+    "color": [0, 1, 0]
   }
 }
