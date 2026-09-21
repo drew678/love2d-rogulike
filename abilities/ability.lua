@@ -24,20 +24,13 @@ function Ability:initFromJson()
     return data
 end
 
-function Ability:canUse(actor, currentTime)
+function Ability:try(actor, target, map, currentTime)
     print(self.onCooldownUntil .. " vs " .. currentTime)
     if(actor.mana < self.manaCost) then
         print(actor.type .. " does not have enough mana to use " .. self.name .. ". Required: " .. self.manaCost .. ", Available: " .. actor.mana)
         return false
     elseif self.onCooldownUntil > currentTime then
         print(actor.type .. " is not ready to use " .. self.name .. " yet. Cooldown remaining: " .. (self.onCooldownUntil - currentTime))
-        return false
-    end
-    return true
-end
-
-function Ability:use(actor, target, map, currentTime)
-    if not self:canUse(actor, currentTime) then
         return false
     end
 

@@ -22,7 +22,8 @@ Map.GameObjectType = {
     ITEM = "item",
     WALL = "wall",
     FLOOR = "floor",
-    HAZARD = "hazard"
+    HAZARD = "hazard",
+    EMPTY = "empty"
 }
 
 function Map:setTarget(target)
@@ -51,7 +52,7 @@ function Map:generateEmptyMap()
     for i = 1, self.num_cols do
         self.grid[i] = {}
         for j = 1, self.num_rows do
-            self.grid[i][j] = {object = {type = "empty"}, visibility = "unseen"}
+            self.grid[i][j] = {object = {type = Map.GameObjectType.EMPTY}, visibility = "unseen"}
         end
     end
 end
@@ -68,7 +69,7 @@ function Map:generateForestMap()
     for i = 1, self.num_cols do
         self.grid[i] = {}
         for j = 1, self.num_rows do
-            local tile = {object = {type = "empty"}, visibility = "unseen"}
+            local tile = {object = {type = Map.GameObjectType.EMPTY}, visibility = "unseen"}
             self.grid[i][j] = tile
             if(math.random() < 0.01) then
                 self.grid[i][j].object = {type = Map.GameObjectType.WALL}
@@ -84,7 +85,7 @@ function Map:generateForestMap()
                 Scheduler:push(0, enemy)
                 self.grid[i][j].object = enemy
             else
-                self.grid[i][j].object = {type = "empty"}
+                self.grid[i][j].object = {type = Map.GameObjectType.EMPTY}
             end
         end
     end
@@ -102,12 +103,15 @@ end
 
 function Map:move(mover, target)
     if(self:isInBounds(target.x, target.y)) then --out of bounds check
-        if(self.grid[target.x][target.y].object.type == "empty") then --empty space check
+        if(self.grid[target.x][target.y].object.type == Map.GameObjectType.EMPTY) then --empty space check
             self:basicMove(mover, target)
             return true
-        else
+        elseif(self.grid[target.x][target.y].object.type == Map.GameObjectType.CREATURE) then --attack check
             mover:attack(self.grid[target.x][target.y].object) --attack
             return true
+        elseif self.grid[target.x][target.y].object.type == Map.GameObjectType.WALL then
+            print("we hit a wall")
+            return false
         end
     else
         return false
@@ -116,8 +120,8 @@ end
 
 function Map:basicMove(mover, target)
     -- assert(self:isInBounds(target.x, target.y), "Attempted to move to out of bounds location")
-    -- assert(self.grid[target.x][target.y].object.type == "empty", "Attempted to move to non-empty location")
-    self.grid[mover.x][mover.y].object = {type = "empty"}
+    -- assert(self.grid[target.x][target.y].object.type == Map.GameObjectType.EMPTY, "Attempted to move to non-empty location")
+    self.grid[mover.x][mover.y].object = {type = Map.GameObjectType.EMPTY}
     mover.x = target.x
     mover.y = target.y
     self.grid[mover.x][mover.y].object = mover
@@ -159,7 +163,7 @@ function Map:getrandomEmptyCell()
         for j = 1, self.num_rows do
             local xi = (x + i -1) % (self.num_cols + 1)
             local yj = (y + j -1) % (self.num_rows + 1)
-            if(self.grid[xi][yj].object.type == "empty") then
+            if(self.grid[xi][yj].object.type == Map.GameObjectType.EMPTY) then
                 return xi, yj, true
             end
         end
@@ -220,7 +224,7 @@ end
 function Map:draw()
     for i = 1, self.num_cols do
         for j = 1, self.num_rows do
-            if(self.grid[i][j].object.type ~= "empty")then
+            if(self.grid[i][j].object.type ~= Map.GameObjectType.EMPTY)then
                 if(self.grid[i][j].visibility == "seeing") then
                     self.grid[i][j].object:draw(i, j, self.row_length, self.col_length)
                 elseif(self.grid[i][j].visibility == "seen") then
@@ -255,7 +259,7 @@ function Map:isSolid(x, y)
     x = math.floor(x)
     y = math.floor(y)
     local obj = self.grid[x][y].object
-    return obj.type == "tree" or obj.type == "enemy" or obj.type == "player"
+    return obj.type == Map.GameObjectType.WALL or obj.type == Map.GameObjectType.CREATURE
 end
 
 function Map:getActorAt(x, y)
@@ -263,7 +267,7 @@ function Map:getActorAt(x, y)
         return nil
     end
     local obj = self.grid[x][y].object
-    if obj.type == "enemy" or obj.type == "player" or obj.type == "ranged enemy" then
+    if obj.type == Map.GameObjectType.CREATURE then
         return obj
     end
     return nil

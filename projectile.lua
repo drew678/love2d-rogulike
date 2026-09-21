@@ -105,7 +105,7 @@ function Projectile:update(map)
     end
     
     -- Check collision with walls/obstacles
-    if map:isSolid(self.mapx, self.mapy) and map.grid[self.mapx][self.mapy].object.type ~= "player" then
+    if map:isSolid(self.mapx, self.mapy) and map.grid[self.mapx][self.mapy].object ~= self.owner then
         print("Projectile hit a wall at (" .. self.x .. ", " .. self.y .. ")")
         return true
     end

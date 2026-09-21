@@ -99,7 +99,7 @@ function love.update(dt)
         if currentAbility then
             if(Input.wasActionPressed("confirm")) then
                 print("Activated ability: " .. currentAbility.name)
-                local success = currentAbility:use(player, map.target, map, playerTime)
+                local success = currentAbility:try(player, map.target, map, playerTime)
                 if success then
                     map:removeTarget()
                     currentGameState = GameStates.SIMULATING
@@ -141,7 +141,7 @@ function love.update(dt)
                 goto continue
             end
             actor:regenerate(time)
-            if(actor.type ~= "player") then
+            if(actor.faction ~= "player") then
                 if(actor.hp <= 0) then
                     goto continue
                 end

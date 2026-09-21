@@ -7,15 +7,16 @@ local AbilityTable = {
 
 Actor.__index = Actor
 
-function Actor.new(x, y, type, map)
+function Actor.new(x, y, creatureType, map)
     local newActor = {}
     setmetatable(newActor, Actor)
     newActor.x = x
     newActor.y = y
-    newActor.type = type
+    newActor.creatureType = creatureType
     newActor.map = map
     newActor.abilities = {}
     newActor.lastRegenTime = 0
+    newActor.type = map.GameObjectType.CREATURE
 
     local game_files = love.filesystem.getSource( )
     local file_path = game_files .. "/" .. "game_data/creatures.json"
@@ -27,18 +28,18 @@ function Actor.new(x, y, type, map)
     local contents = file:read("*a")
     file:close()
     local data = Json.decode(contents)
-    newActor.maxHp = data[type].maxHp
+    newActor.maxHp = data[creatureType].maxHp
     newActor.hp = newActor.maxHp
-    newActor.maxMana = data[type].maxMana
+    newActor.maxMana = data[creatureType].maxMana
     newActor.mana = newActor.maxMana
-    newActor.damage = data[type].damage
-    newActor.speed = data[type].speed
-    newActor.healthRegen = data[type].healthRegen
-    newActor.manaRegen = data[type].manaRegen
-    newActor.faction = data[type].faction
-    newActor.color = data[type].color or {1, 1, 1} -- default to white if no color specified
+    newActor.damage = data[creatureType].damage
+    newActor.speed = data[creatureType].speed
+    newActor.healthRegen = data[creatureType].healthRegen
+    newActor.manaRegen = data[creatureType].manaRegen
+    newActor.faction = data[creatureType].faction
+    newActor.color = data[creatureType].color or {1, 1, 1} -- default to white if no color specified
 
-    for i, abilityName in ipairs(data[type].abilities) do
+    for i, abilityName in ipairs(data[creatureType].abilities) do
         local Ability = AbilityTable[abilityName]
         newActor:addAbility(abilityName, Ability.new(ability))
     end
